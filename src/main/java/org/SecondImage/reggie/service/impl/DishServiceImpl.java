@@ -134,7 +134,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         queryWrapper2.in(ids != null,SetmealDish::getDishId,ids);
         List<SetmealDish> list2 = setmealDishService.list(queryWrapper2);
         for (SetmealDish setmealDish : list2){
-            setmealIds.add(setmealDish.getSetmealId()); //空指针异常
+            setmealIds.add(setmealDish.getSetmealId());
         }
 
         LambdaQueryWrapper<Setmeal> queryWrapper3 = new LambdaQueryWrapper<>();

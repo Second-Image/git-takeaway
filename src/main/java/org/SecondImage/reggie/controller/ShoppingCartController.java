@@ -5,7 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.SecondImage.reggie.common.BaseContext;
 import org.SecondImage.reggie.common.CustomException;
 import org.SecondImage.reggie.common.R;
+import org.SecondImage.reggie.entry.Dish;
+import org.SecondImage.reggie.entry.Setmeal;
 import org.SecondImage.reggie.entry.ShoppingCart;
+import org.SecondImage.reggie.service.DishService;
+import org.SecondImage.reggie.service.SetmealService;
 import org.SecondImage.reggie.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +25,11 @@ public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
 
+    //查询添加到购物车的菜品或套餐的状态，因为可能用户在浏览时管理者将某个菜品或套餐停售了
+    @Autowired
+    private DishService dishService;
+    @Autowired
+    private SetmealService setmealService;
     /**
      * 添加购物车
      * @param shoppingCart
@@ -41,8 +50,18 @@ public class ShoppingCartController {
         //判断
         if (dishId != null){
             lambdaQueryWrapper.eq(ShoppingCart::getDishId,dishId);
+            //查询菜品状态
+            Dish byId = dishService.getById(dishId);
+            if (byId.getStatus() == 0){
+                return R.error("该商品状态异常，请重新访问");
+            }
         }else if (setmealId != null){
             lambdaQueryWrapper.eq(ShoppingCart::getSetmealId,setmealId);
+            //查询套餐状态
+            Setmeal byId = setmealService.getById(setmealId);
+            if (byId.getStatus() == 0){
+                return R.error("该商品状态异常，请重新访问");
+            }
         }else{
             throw new CustomException("无菜品或套餐ID传入！");
         }

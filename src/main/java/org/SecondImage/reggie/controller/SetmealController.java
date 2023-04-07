@@ -14,11 +14,16 @@ import org.SecondImage.reggie.service.SetmealDishService;
 import org.SecondImage.reggie.service.SetmealService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,6 +36,8 @@ public class SetmealController {
     private SetmealDishService setmealDishService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 新增套餐
@@ -38,6 +45,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping
+    @CacheEvict(value = "setmealCache",key = "#setmealDto.categoryId") //清理setmealCache下对应套餐分类ID的所有缓存
     public R<String> save(@RequestBody SetmealDto setmealDto){
         log.info("套餐信息: {}",setmealDto);
         setmealService.addWithDish(setmealDto);
@@ -84,6 +92,7 @@ public class SetmealController {
      * @return
      */
     @PutMapping
+    @CacheEvict(value = "setmealCache",key = "#setmealDto.categoryId") //清理setmealCache下对应套餐分类ID的所有缓存
     public R<String> update(@RequestBody SetmealDto setmealDto){
         setmealService.updateWithDish(setmealDto);
         return R.success("修改成功");
@@ -99,6 +108,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping("/status/{status}")
+    @CacheEvict(value = "setmealCache",allEntries = true) //清理setmealCache下的所有缓存
     public R<String> updateStatus(@PathVariable("status") Integer status,@RequestParam List<Long> ids){
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(ids != null,Setmeal::getId,ids);
@@ -107,10 +117,13 @@ public class SetmealController {
             setmeal.setStatus(status);
             setmealService.updateById(setmeal);
         }
+        Set keys = redisTemplate.keys("setmeal_*");
+        redisTemplate.delete(keys);
         return R.success("套餐状态修改成功");
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId + '_' + #setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal){
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(setmeal.getCategoryId() != null,Setmeal::getCategoryId,setmeal.getCategoryId());
