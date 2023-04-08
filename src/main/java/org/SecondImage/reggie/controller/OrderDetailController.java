@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping
+@RequestMapping("/orderDetail")
 public class OrderDetailController {
+    //订单内容打印出来给商家，要有商家接口，涉及orderDetail和order两表联查
 }

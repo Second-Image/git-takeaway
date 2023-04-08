@@ -7,7 +7,7 @@ const getOrderDetailPage = (params) => {
   })
 }
 
-// 查看接口
+// 查看接口 //订单内容打印出来给商家
 const queryOrderDetailById = (id) => {
   return $axios({
     url: `/orderDetail/${id}`,
