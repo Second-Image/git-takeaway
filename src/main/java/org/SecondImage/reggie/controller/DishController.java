@@ -9,6 +9,8 @@ import org.SecondImage.reggie.entry.*;
 import org.SecondImage.reggie.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,13 +44,14 @@ public class DishController {
     private RedisTemplate redisTemplate;
 
     @PostMapping
+    @CacheEvict(value = "dishCache",key = "#dishDto.categoryId") //清理dishCache下对应套餐分类ID的所有缓存
     public R<String> save(@RequestBody DishDto dishDto){
         log.info(dishDto.toString());
         dishService.saveWithFlavor(dishDto);
-        //管理者新增菜品，清理该菜品分类下的redis缓存
-        String key = "dish_"+dishDto.getCategoryId()+"_1";
-        redisTemplate.delete(key);
-        //还需要获得与菜品关联的套餐，清除套餐的redis缓存
+//        //管理者新增菜品，清理该菜品分类下的redis缓存
+//        String key = "dish_"+dishDto.getCategoryId()+"_1";
+//        redisTemplate.delete(key);
+//        //还需要获得与菜品关联的套餐，清除套餐的redis缓存
 
         return R.success("新增菜品成功");
     }
@@ -63,24 +66,7 @@ public class DishController {
 
         dishService.page(pageInfo,queryWrapper);
 
-        //在Dish实体类中新增了 private String categoryName; 不参与SQL操作，用该属性存储通过categoryId查询到的菜品分类类名。已注释掉多余代码
-//        Page<DishDto> dtoPage = new Page<>(page,pageSize);
-//        BeanUtils.copyProperties(pageInfo,dtoPage,"records");
-
         List<Dish> records = pageInfo.getRecords();
-//        List<DishDto> list = records.stream().map((d)-> {
-//            DishDto dishDto = new DishDto();
-//            BeanUtils.copyProperties(d,dishDto);
-//            Long categoryId = d.getCategoryId();
-//            Category category = categoryService.getById(categoryId);
-//            String categoryName = category.getName();
-//            dishDto.setCategoryName(categoryName);
-//            return dishDto;
-//        }).collect(Collectors.toList());
-//
-//        dtoPage.setRecords(list);
-//
-//        return R.success(dtoPage);
 
         for (Dish dish : records){
             Category category = categoryService.getById(dish.getCategoryId());
@@ -102,13 +88,14 @@ public class DishController {
      * @return
      */
     @PutMapping
+    @CacheEvict(value = "dishCache",key = "#dishDto.categoryId") //清理dishCache下对应套餐分类ID的所有缓存
     public R<String> update(@RequestBody DishDto dishDto){
 
         dishService.updateWithFlavor(dishDto);
 
-        //管理者修改菜品，清理某个分类下的redis缓存   如果修改菜品的分类则不行
-        String key = "dish_"+dishDto.getCategoryId()+"_1";
-        redisTemplate.delete(key);
+//        //管理者修改菜品，清理某个分类下的redis缓存   如果修改菜品的分类则不行
+//        String key = "dish_"+dishDto.getCategoryId()+"_1";
+//        redisTemplate.delete(key);
 
         return R.success("修改成功");
     }
@@ -135,15 +122,9 @@ public class DishController {
 //    }
 
     @GetMapping("/list")
+    @Cacheable(value = "dishCache",key = "#dish.categoryId + '_' + #dish.status")
     public R<List<DishDto>> list(Dish dish){
         List<DishDto> dishDtoList = null;
-        //动态构造key
-        String key = "dish_"+dish.getCategoryId()+"_"+dish.getStatus();
-        //先从Redis查找菜品数据
-        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
-        if (dishDtoList != null){
-            return R.success(dishDtoList);
-        }
 
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
@@ -174,9 +155,6 @@ public class DishController {
             return dishDto;
         }).collect(Collectors.toList());
 
-        //如果Redis中没有菜品数据，则存入redis，保存两小时
-        redisTemplate.opsForValue().set(key,dishDtoList,2, TimeUnit.HOURS);
-
         return R.success(dishDtoList);
     }
 
@@ -185,10 +163,11 @@ public class DishController {
      * @return
      */
     @PostMapping("/status/{status}")
+    @CacheEvict(value = "dishCache",allEntries = true) //清理dishCache下的所有缓存
     public R<String> updateStatus(@PathVariable("status") Integer status,@RequestParam List<Long> ids){
         dishService.updateStatus(status,ids);
-        Set keys = redisTemplate.keys("dish_*");
-        redisTemplate.delete(keys);
+//        Set keys = redisTemplate.keys("dish_*");
+//        redisTemplate.delete(keys);
         return R.success("菜品和含有该菜品的套餐状态已修改");
     }
 }
