@@ -87,16 +87,43 @@ public class SetmealController {
     }
 
     /**
-     * 修改菜品信息
+     * 修改套餐信息
      * @param setmealDto
      * @return
      */
     @PutMapping
     @CacheEvict(value = "setmealCache",key = "#setmealDto.categoryId") //清理setmealCache下对应套餐分类ID的所有缓存
     public R<String> update(@RequestBody SetmealDto setmealDto){
-        setmealService.updateWithDish(setmealDto);
-        return R.success("修改成功");
+        if(setmealDto==null)
+        {
+            return  R.error("请求异常");
+        }
+        //判断套餐下面是否还有关联菜品
+        if(setmealDto.getSetmealDishes()==null)
+        {
+            return R.error("套餐没有菜品，请添加");
+        }
+        //获取到前端提交的修改后的关联的菜品列表
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+        //获取到套餐的id
+        Long setmealId = setmealDto.getId();
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        //根据套餐id在关联菜品中查询数据
+        queryWrapper.eq(SetmealDish::getSetmealId,setmealId);
+        setmealDishService.remove(queryWrapper);
+        //为setmeal_dish表填充相关的属性
+        //这里我们需要为关联菜品的表前面的字段填充套餐的id
+        for(SetmealDish setmealDish:setmealDishes)
+        {
+            setmealDish.setSetmealId(setmealId);//填充属性值
+        }
+        //批量把setmealDish保存到setmeal_dish表
+        setmealDishService.saveBatch(setmealDishes);//保存套餐关联菜品
+        //更新套餐
+        setmealService.updateById(setmealDto);
+        return R.success("套餐修改成功");
     }
+
     @GetMapping("/{id}")
     public R<SetmealDto> getById(@PathVariable Long id){
         SetmealDto setmealDto = setmealService.getByIdWithDish(id);
@@ -122,6 +149,11 @@ public class SetmealController {
         return R.success("套餐状态修改成功");
     }
 
+    /**
+     * 用户端套餐展示
+     * @param setmeal
+     * @return
+     */
     @GetMapping("/list")
     @Cacheable(value = "setmealCache",key = "#setmeal.categoryId + '_' + #setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal){

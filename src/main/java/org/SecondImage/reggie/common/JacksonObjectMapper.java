@@ -42,8 +42,12 @@ public class JacksonObjectMapper extends ObjectMapper {
                 .addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)))
                 .addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)))
 
-                .addSerializer(BigInteger.class, ToStringSerializer.instance)  //将BigInteger型数据转换为字符串
-                .addSerializer(Long.class, ToStringSerializer.instance)  //将Long型数据转换为字符串
+                //将BigInteger型数据转换为字符串
+                .addSerializer(BigInteger.class, ToStringSerializer.instance)
+                //将Long型数据转换为字符串
+                //由于JSt中Number类型的自身原因，并不能完全表示Long型的数字，在Long长度大于17位时会出现精度丢失的问题
+                //传Long类型数据（雪花算法ID）到前端时，由于Long类型长度19，导致前端接受数据会把后两位数字变为0，而字符串则不会
+                .addSerializer(Long.class, ToStringSerializer.instance)
                 .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
                 .addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)))
                 .addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));

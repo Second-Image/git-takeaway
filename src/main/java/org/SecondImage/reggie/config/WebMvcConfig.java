@@ -1,6 +1,7 @@
 package org.SecondImage.reggie.config;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.SecondImage.reggie.common.JacksonObjectMapper;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Configuration;

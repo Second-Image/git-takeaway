@@ -101,6 +101,9 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         for(SetmealDish setmealDish : setmealDishes){
             setmealDish.setSetmealId(setmealDto.getId());
         }
+        //批量保存套餐关联的菜品
         setmealDishService.saveBatch(setmealDishes);
+        //更新套餐
+        this.updateById(setmealDto);
     }
 }

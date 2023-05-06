@@ -110,7 +110,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         for (DishFlavor flavor : flavors){
             flavor.setDishId(dishDto.getId());
         }
-        dishFlavorService.saveBatch(flavors);
+        dishFlavorService.saveBatch(flavors);//批量保存
     }
 
     /**
@@ -124,25 +124,27 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         queryWrapper1.in(ids != null,Dish::getId,ids);
         List<Dish> list1 = this.list(queryWrapper1);
         for (Dish dish : list1){
-            dish.setStatus(status);
-            this.updateById(dish);
+            if(dish != null) {
+                dish.setStatus(status);
+                this.updateById(dish);
+            }
         }
 
         //更改套餐的状态
-        List<Long> setmealIds = new ArrayList<>();
-        LambdaQueryWrapper<SetmealDish> queryWrapper2 = new LambdaQueryWrapper<>();
-        queryWrapper2.in(ids != null,SetmealDish::getDishId,ids);
-        List<SetmealDish> list2 = setmealDishService.list(queryWrapper2);
-        for (SetmealDish setmealDish : list2){
-            setmealIds.add(setmealDish.getSetmealId());
-        }
-
-        LambdaQueryWrapper<Setmeal> queryWrapper3 = new LambdaQueryWrapper<>();
-        queryWrapper3.in(Setmeal::getId,setmealIds);
-        List<Setmeal> list3 = setmealService.list(queryWrapper3);
-        for (Setmeal setmeal : list3){
-            setmeal.setStatus(status);
-            setmealService.updateById(setmeal);
-        }
+//        List<Long> setmealIds = new ArrayList<>();
+//        LambdaQueryWrapper<SetmealDish> queryWrapper2 = new LambdaQueryWrapper<>();
+//        queryWrapper2.in(ids != null,SetmealDish::getDishId,ids);
+//        List<SetmealDish> list2 = setmealDishService.list(queryWrapper2);
+//        for (SetmealDish setmealDish : list2){
+//            setmealIds.add(setmealDish.getSetmealId());
+//        }
+//
+//        LambdaQueryWrapper<Setmeal> queryWrapper3 = new LambdaQueryWrapper<>();
+//        queryWrapper3.in(Setmeal::getId,setmealIds);
+//        List<Setmeal> list3 = setmealService.list(queryWrapper3);
+//        for (Setmeal setmeal : list3){
+//            setmeal.setStatus(status);
+//            setmealService.updateById(setmeal);
+//        }
     }
 }

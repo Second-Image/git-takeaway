@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +48,7 @@ public class DishController {
     @CacheEvict(value = "dishCache",key = "#dishDto.categoryId") //清理dishCache下对应套餐分类ID的所有缓存
     public R<String> save(@RequestBody DishDto dishDto){
         log.info(dishDto.toString());
+
         dishService.saveWithFlavor(dishDto);
 //        //管理者新增菜品，清理该菜品分类下的redis缓存
 //        String key = "dish_"+dishDto.getCategoryId()+"_1";
@@ -169,5 +171,20 @@ public class DishController {
 //        Set keys = redisTemplate.keys("dish_*");
 //        redisTemplate.delete(keys);
         return R.success("菜品和含有该菜品的套餐状态已修改");
+    }
+
+    /**
+     * 单个删除+批量删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(String ids){
+        String[] split = ids.split(","); //将每个id分开
+        //每个id还是字符串，转成Long
+        List<Long> idList = Arrays.stream(split).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+        dishService.removeByIds(idList);//执行批量删除
+        log.info("删除的ids: {}",ids);
+        return R.success("删除成功"); //返回成功
     }
 }
