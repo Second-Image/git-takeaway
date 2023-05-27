@@ -179,11 +179,12 @@ public class DishController {
      * @return
      */
     @DeleteMapping
-    public R<String> delete(String ids){
-        String[] split = ids.split(","); //将每个id分开
-        //每个id还是字符串，转成Long
-        List<Long> idList = Arrays.stream(split).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
-        dishService.removeByIds(idList);//执行批量删除
+    public R<String> delete(@RequestParam("ids") List<Long> ids){
+//        String[] split = ids.split(","); //将每个id分开
+//        //每个id还是字符串，转成Long
+//        List<Long> idList = Arrays.stream(split).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+//        dishService.removeByIds(idList);//执行批量删除
+        dishService.deleteWithFlavor(ids);
         log.info("删除的ids: {}",ids);
         return R.success("删除成功"); //返回成功
     }

@@ -59,7 +59,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      */
     public void deleteWithFlavor(List<Long> ids) {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.in(Dish::getId,ids);
+        queryWrapper.in(ids!=null,Dish::getId,ids);
         queryWrapper.eq(Dish::getStatus,1);
         int count = this.count(queryWrapper);
         if (count > 0){
