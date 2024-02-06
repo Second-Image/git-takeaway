@@ -29,6 +29,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * 新增套餐，保存套餐Setmeal和菜品的关联关系SetmealDish
      * @param setmealDto
      */
+    @Override
     @Transactional //操作多张表，要么全部操作成功，要么失败，保证事务的一致性
     public void addWithDish(SetmealDto setmealDto) {
         //保存套餐信息
@@ -46,6 +47,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * (批量)删除套餐信息Setmeal SetmealDish
      * @param ids
      */
+    @Override
     @Transactional
     public void deleteWithDish(List<Long> ids) {
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
@@ -89,6 +91,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * 修改套餐信息Setmeal 和 SetmealDish，包括套餐的启用、禁用
      * @param setmealDto
      */
+    @Override
     public void updateWithDish(SetmealDto setmealDto) {
         //修改套餐Setmeal数据
         this.updateById(setmealDto);

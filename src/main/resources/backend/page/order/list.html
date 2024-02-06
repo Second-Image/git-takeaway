@@ -21,9 +21,9 @@
   }
   .info-box .item-box{
     display: flex;
-    height: 20px;
-    line-height: 20px;
-    font-size: 14px;
+    height: 15px;
+    line-height: 10px;
+    font-size: 12px;
     font-weight: 400;
     color: #666666;
     text-align: left;
@@ -69,7 +69,7 @@
             <span>{{ getOrderType(row) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="userName" label="用户"></el-table-column>
+        <el-table-column prop="consignee" label="用户"></el-table-column>
         <el-table-column prop="phone" label="手机号"></el-table-column>
         <el-table-column prop="address" label="地址" show-overflow-tooltip></el-table-column>
         <el-table-column prop="orderTime" label="下单时间" min-width="100"></el-table-column>
@@ -93,6 +93,7 @@
             </el-button>
           </template>
         </el-table-column>
+        <el-table-column prop="takeoutMan" label="外卖员"></el-table-column>
       </el-table>
       <el-pagination
         class="pageList"
@@ -141,6 +142,10 @@
         <div class="item-box">
           <span class="label">下单时间：</span>
           <span class="des">{{ diaForm.orderTime }}</span>
+        </div>
+        <div class="item-box">
+          <span class="label">外卖员：</span>
+          <span class="des">{{ diaForm.takeoutMan }}</span>
         </div>
       </div>
       <!-- <el-form ref="diaForm" :model="diaForm" class="dia-form">

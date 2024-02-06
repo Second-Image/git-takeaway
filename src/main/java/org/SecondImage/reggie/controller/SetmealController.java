@@ -7,9 +7,11 @@ import org.SecondImage.reggie.common.R;
 import org.SecondImage.reggie.dto.DishDto;
 import org.SecondImage.reggie.dto.SetmealDto;
 import org.SecondImage.reggie.entry.Category;
+import org.SecondImage.reggie.entry.Dish;
 import org.SecondImage.reggie.entry.Setmeal;
 import org.SecondImage.reggie.entry.SetmealDish;
 import org.SecondImage.reggie.service.CategoryService;
+import org.SecondImage.reggie.service.DishService;
 import org.SecondImage.reggie.service.SetmealDishService;
 import org.SecondImage.reggie.service.SetmealService;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +40,8 @@ public class SetmealController {
     private CategoryService categoryService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private DishService dishService;
 
     /**
      * 新增套餐
@@ -165,5 +169,26 @@ public class SetmealController {
         List<Setmeal> list = setmealService.list(queryWrapper);
 
         return R.success(list);
+    }
+    /**
+     * 展示套餐中的菜品
+     * @return
+     */
+    @GetMapping("/dish/{id}")
+    public R<List<DishDto>> setMeal_dishDto(@PathVariable("id") Long SetmealId){
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId,SetmealId);
+
+        List<SetmealDish> list = setmealDishService.list(queryWrapper);
+
+        List<DishDto> dishDtos = list.stream().map((setmealDish) -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(setmealDish,dishDto);
+            Long dishId = setmealDish.getDishId();
+            Dish dish = dishService.getById(dishId);
+            BeanUtils.copyProperties(dish,dishDto);
+            return  dishDto;
+        }).collect(Collectors.toList());
+        return R.success(dishDtos);
     }
 }

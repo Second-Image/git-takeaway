@@ -55,12 +55,7 @@ public class CommonController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        try {
-//            //将临时文件存到指定位置
-//            file.transferTo(new File("D:\\hello.jpg"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
         //返回文件名，新增菜品时要获取图片文件名传给服务器存入数据库
         return R.success(fileName);
     }

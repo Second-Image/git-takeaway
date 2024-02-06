@@ -40,6 +40,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
      * 用户下单
      * @param orders
      */
+    @Override
     @Transactional  //操作多个表
     public void submit(Orders orders) {
         //获得当前用户ID
@@ -98,5 +99,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         orderDetailService.saveBatch(orderDetails);
         //清空购物车数据
         shoppingCartService.remove(wrapper);
+    }
+
+    @Override
+    public List<OrderDetail> getOrderDetailListByOrderId(Long orderId){
+        LambdaQueryWrapper<OrderDetail> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderDetail::getOrderId, orderId);
+        //根据order表的条件查询出order_detail的数据，因为一个订单可能有多条菜品数据
+        List<OrderDetail> orderDetailList = orderDetailService.list(queryWrapper);
+        return orderDetailList;
     }
 }

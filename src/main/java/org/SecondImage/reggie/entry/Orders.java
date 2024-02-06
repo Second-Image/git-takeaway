@@ -58,4 +58,9 @@ public class Orders implements Serializable {
 
     //收货人
     private String consignee;
+
+    //外卖员
+    private String takeoutMan;
+
+    private Long takeoutManId;
 }

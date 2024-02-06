@@ -39,7 +39,7 @@ public class ShoppingCartController {
     public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart){
         log.info("购物车数据: {}",shoppingCart);
         //设置用户ID，获取当前用户ID
-        Long currentId = BaseContext.getCurrentId(); //也能从session获取
+        Long currentId = BaseContext.getCurrentId();
         shoppingCart.setUserId(currentId);
         //判断添加到购物车的是菜品还是套餐
         Long dishId = shoppingCart.getDishId();

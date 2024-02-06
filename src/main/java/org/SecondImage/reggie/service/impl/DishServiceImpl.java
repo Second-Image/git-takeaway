@@ -39,6 +39,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      * 保存菜品和菜品口味
      * @param dishDto
      */
+    @Override
     @Transactional
     public void saveWithFlavor(DishDto dishDto) {
         //会自动识别多余字段
@@ -57,6 +58,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      * (批量)删除菜品信息
      * @param ids
      */
+    @Override
     public void deleteWithFlavor(List<Long> ids) {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(ids!=null,Dish::getId,ids);
@@ -118,6 +120,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      * @param status
      * @param ids
      */
+    @Override
     @Transactional
     public void updateStatus(Integer status, List<Long> ids) {
         LambdaQueryWrapper<Dish> queryWrapper1 = new LambdaQueryWrapper<>();
@@ -130,21 +133,5 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             }
         }
 
-        //更改套餐的状态
-//        List<Long> setmealIds = new ArrayList<>();
-//        LambdaQueryWrapper<SetmealDish> queryWrapper2 = new LambdaQueryWrapper<>();
-//        queryWrapper2.in(ids != null,SetmealDish::getDishId,ids);
-//        List<SetmealDish> list2 = setmealDishService.list(queryWrapper2);
-//        for (SetmealDish setmealDish : list2){
-//            setmealIds.add(setmealDish.getSetmealId());
-//        }
-//
-//        LambdaQueryWrapper<Setmeal> queryWrapper3 = new LambdaQueryWrapper<>();
-//        queryWrapper3.in(Setmeal::getId,setmealIds);
-//        List<Setmeal> list3 = setmealService.list(queryWrapper3);
-//        for (Setmeal setmeal : list3){
-//            setmeal.setStatus(status);
-//            setmealService.updateById(setmeal);
-//        }
     }
 }

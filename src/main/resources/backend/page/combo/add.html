@@ -421,11 +421,12 @@
                       callback(new Error('请填写菜品价格'))
                     } else {
                       const reg = /^\d+(\.\d{0,2})?$/
+                      //reg 正则表达式校验价格格式
                       if (reg.test(value)) {
                         if(value < 10000){
                           callback()
                         }else{
-                          callback(new Error('菜品价格小于10000'))
+                          callback(new Error('菜品价格应小于10000'))
                         }
                       } else {
                         callback(new Error('菜品价格格式只能为数字,且最多保留两位小数'))
@@ -670,7 +671,7 @@
             })
           },
 
-          // 关键词收搜菜品列表分类
+          // 关键词搜索菜品列表分类
           getDishForName (name) {
             queryDishList({name}).then(res => {
               if (res.code === 1) {

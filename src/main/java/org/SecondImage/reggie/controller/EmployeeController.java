@@ -55,7 +55,7 @@ public class EmployeeController {
             return R.error("该用户已禁用！");
         }
 
-        //6.登陆成功，将用户ID存入session，并返回查询的结果emp
+        //6.登陆成功，将员工ID存入session，并返回查询的结果emp
         request.getSession().setAttribute("employee",emp.getId());
         return R.success(emp);
     }
@@ -128,6 +128,11 @@ public class EmployeeController {
         log.info("employee: {}",employee.toString());
 
         Long empId = (Long) request.getSession().getAttribute("employee");
+
+        if (employee.getUsername()=="admin" || employee.getId()==1){
+            return  R.error("管理员不能被禁用！");
+        }
+
         employee.setUpdateUser(empId);
         employee.setUpdateTime(LocalDateTime.now());
 

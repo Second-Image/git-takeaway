@@ -9,10 +9,13 @@ import org.SecondImage.reggie.common.R;
 import org.SecondImage.reggie.entry.AddressBook;
 import org.SecondImage.reggie.service.AddressBookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 地址簿管理
@@ -25,6 +28,9 @@ public class AddressBookController {
     @Autowired
     private AddressBookService addressBookService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     /**
      * 新增
      */
@@ -32,7 +38,18 @@ public class AddressBookController {
     public R<AddressBook> save(@RequestBody AddressBook addressBook) {
         addressBook.setUserId(BaseContext.getCurrentId());
         log.info("addressBook:{}", addressBook);
+        //地址不重复判断会导致A不能用B的地址给B买东西
+//        LambdaUpdateWrapper<AddressBook> wrapper = new LambdaUpdateWrapper<>();
+//        wrapper.eq(AddressBook::getUserId,addressBook.getUserId());
+//        List<AddressBook> list = addressBookService.list(wrapper);
+//        for (int i=0;i<list.size();i++){
+//            AddressBook address = list.get(i);
+//            if (address.getDetail().equals(addressBook.getDetail())){
+//                return R.error("地址重复");
+//            }
+//        }
         addressBookService.save(addressBook);
+
         return R.success(addressBook);
     }
 
@@ -91,6 +108,7 @@ public class AddressBookController {
      */
     @GetMapping("/list")
     public R<List<AddressBook>> list(AddressBook addressBook) {
+        //在本机中每次启动，线程ID都不同，会导致对应手机号用户查不到地址
         addressBook.setUserId(BaseContext.getCurrentId());
         log.info("addressBook:{}", addressBook);
 
@@ -101,5 +119,11 @@ public class AddressBookController {
 
         //SQL:select * from address_book where user_id = ? order by update_time desc
         return R.success(addressBookService.list(queryWrapper));
+    }
+    @DeleteMapping()
+    public R<String> detele(@RequestParam("ids") Long id){
+        log.info("id={}",id);
+        addressBookService.removeById(id);
+        return R.success("删除成功");
     }
 }

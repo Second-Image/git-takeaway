@@ -35,7 +35,10 @@ public class LoginCheckFilter implements Filter {
                 "/front/**",
                 "/common/**",
                 "/user/sendMsg",
-                "/user/login"
+                "/user/login",
+                "/takeout/**",
+                "/manForTakeaway/login",
+                "/manForTakeaway/add"
         };
         //2.判断该次请求是否处理
         boolean check = check(urls,requestURI);
@@ -60,6 +63,16 @@ public class LoginCheckFilter implements Filter {
             log.info("已登录，ID: {}",request.getSession().getAttribute("user"));
             //保存当前登录用户ID到该线程中
             Long empId = (Long) request.getSession().getAttribute("user");
+            BaseContext.setCurrentId(empId);
+
+            filterChain.doFilter(request,response);
+            return;
+        }
+        // 判断外卖员是否登录
+        if (request.getSession().getAttribute("manForTakeaway") != null){
+            log.info("已登录，ID: {}",request.getSession().getAttribute("manForTakeaway"));
+            //保存当前登录用户ID到该线程中
+            Long empId = (Long) request.getSession().getAttribute("manForTakeaway");
             BaseContext.setCurrentId(empId);
 
             filterChain.doFilter(request,response);

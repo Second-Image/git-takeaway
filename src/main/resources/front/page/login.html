@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no,minimal-ui">
-        <title>菩提阁</title>
+        <title>木桶饭</title>
         <link rel="icon" href="./../images/favico.ico">
         <!--不同屏幕尺寸根字体设置-->
         <script src="./../js/base.js"></script>
@@ -38,6 +38,7 @@
         <script src="./../js/vant.min.js"></script>  
         <!-- 引入axios -->
         <script src="../../backend/plugins/axios/axios.min.js"></script>
+
         <script src="./../js/request.js"></script>
         <script src="./../api/login.js"></script>
     </body>
@@ -63,7 +64,7 @@
                     const regex = /^(13[0-9]{9})|(15[0-9]{9})|(17[0-9]{9})|(18[0-9]{9})|(19[0-9]{9})$/;
                     if (regex.test(this.form.phone)) {
                         this.msgFlag = false
-                        this.form.code = (Math.random()*1000000).toFixed(0)
+                        // this.form.code = (Math.random()*1000000).toFixed(0)
                         const res = sendMsgApi({phone:this.form.phone})
                         sessionStorage.setItem("code",res)
                     }else{

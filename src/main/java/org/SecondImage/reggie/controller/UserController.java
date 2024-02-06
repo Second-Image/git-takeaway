@@ -1,6 +1,7 @@
 package org.SecondImage.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.SecondImage.reggie.common.R;
 import org.SecondImage.reggie.entry.User;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -79,5 +82,10 @@ public class UserController {
         }
 
         return R.error("登陆失败");
+    }
+    @PostMapping("/loginout")
+    public R<String> loginout(HttpServletRequest request){
+        request.getSession().removeAttribute("user");
+        return R.success("退出成功");
     }
 }
