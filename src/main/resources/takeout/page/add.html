@@ -46,6 +46,17 @@
                 />
             </el-form-item>
 
+            <el-form-item
+                    label="身份证号:"
+                    prop="id_number"
+            >
+                <el-input
+                        v-model="ruleForm.id_number"
+                        placeholder="请输入身份证号"
+                        maxlength="18"
+                />
+            </el-form-item>
+
             <div class="subBox address">
                 <el-form-item>
                     <el-button  @click="goBack()">
@@ -86,7 +97,8 @@
                 ruleForm : {
                     'name': '',
                     'phone': '',
-                    username: ''
+                    username: '',
+                    'id_number':''
                 }
             }
         },
@@ -101,7 +113,8 @@
                     ],
                     //姓名
                     name: [{ required: true, 'validator': checkName, 'trigger': 'blur' }],
-                    'phone': [{ 'required': true, 'validator': checkPhone, 'trigger': 'blur' }]
+                    'phone': [{ 'required': true, 'validator': checkPhone, 'trigger': 'blur' }],
+                    'id_number': [{ 'required': true, 'trigger': 'blur' }]
                 }
             }
         },

@@ -215,10 +215,10 @@
                         str =  '待付款'
                         break;
                     case 2:
-                        str =  '正在派送'
+                        str =  '待派送'
                         break;
                     case 3:
-                        str =  '已派送'
+                        str =  '派送中'
                         break;
                     case 4:
                         str =  '已完成'
@@ -245,7 +245,7 @@
                 }).then(() => {
                     editOrderDetail(params).then(res => {
                         if (res.code === 1) {
-                            this.$message.success(status === 3 ? '订单已派送' : '订单已完成')
+                            this.$message.success(status === 3 ? '订单派送中' : '订单已完成')
                             this.init()
                         } else {
                             this.$message.error(res.msg || '操作失败')

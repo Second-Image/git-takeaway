@@ -17,6 +17,8 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -85,17 +87,28 @@ public class ManForTakeawayController {
      * @return
      */
     @GetMapping("/order/page")
-    public R<Page> list(int page, int pageSize, Long number, String beginTime, String endTime){
+    public R<Page> list(int page, int pageSize, Long number, String beginTime, String endTime,HttpServletRequest request){
         log.info("number: {}",number); //订单号
         log.info("beginTime: {}",beginTime);
         log.info("endTime: {}",endTime);
+        Long takeoutId = (Long) request.getSession().getAttribute("manForTakeaway");
+        log.info("takeoutManID: {}",takeoutId);
 
         Page<Orders> pageInfo = new Page<>(page,pageSize);
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(number != null,Orders::getNumber,number);
         queryWrapper.ge(beginTime != null,Orders::getOrderTime,beginTime);
         queryWrapper.le(endTime != null,Orders::getOrderTime,endTime);
+        queryWrapper.eq(Orders::getStatus,2)
+                .or().
+                nested(i -> i.in(Orders::getStatus,3,4).eq(Orders::getTakeoutManId,takeoutId));
         queryWrapper.orderByDesc(Orders::getOrderTime);
+
+//        LambdaQueryWrapper<Orders> queryWrapper2 = new LambdaQueryWrapper<>();
+//        queryWrapper2.like(number != null,Orders::getNumber,number);
+//        queryWrapper2.ge(beginTime != null,Orders::getOrderTime,beginTime);
+//        queryWrapper2.le(endTime != null,Orders::getOrderTime,endTime);
+//        queryWrapper2.nested(i -> i.in(Orders::getStatus,3,4).eq(Orders::getTakeoutManId,takeoutId));
 
         orderService.page(pageInfo,queryWrapper);
 
